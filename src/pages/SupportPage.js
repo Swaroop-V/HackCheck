@@ -32,7 +32,7 @@ const SupportPage = () => {
         <section>
           <h2>Contact Us</h2>
           <p>If your question isn't answered in the FAQ, please feel free to reach out to our support team. We'll do our best to get back to you as soon as possible.</p>
-          <p>Email: <a href="mailto:support@leakguard.com" className="support-email-link">support@leakguard.com</a></p>
+          <p>Email: <a href="mailto:support@hackcheck.com" className="support-email-link">support@hackcheck.com</a></p>
         </section>
       </div>
     </div>
