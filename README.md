@@ -10,8 +10,9 @@ A full-stack web application designed to help users **securely check** if their 
 ---
 ✨ Features
 HackCheck demonstrates a complete full-stack workflow with a focus on security and user experience:
-
 🔒 Secure Password Checking using the k-Anonymity model via the Have I Been Pwned API.
+
+---
 
 👤 User Authentication:
 
@@ -21,34 +22,37 @@ Password hashing with bcrypt.js
 🔐 Persistent Login Sessions using sessionStorage and React Context API
 🌓 Dynamic UI: Auth-based navigation with a responsive dark-themed interface
 💳 Simulated E-Commerce Flow: Pricing tiers, checkout UI, and live form validation
-🎯 Animations: Smooth scroll-triggered animations using Intersection Observer API
+🎯 Animations: Smooth scroll-triggered animations using Intersection Observer API 
+
 -------------------------------------------------
 
-🛠️ Tech Stack :
-Frontend
+🛠️ Tech Stack : 
+Frontend -
 Framework: React.js
-
 Routing: React Router v6
-
 State Management: React Hooks (useState, useContext)
-
 Styling: Pure CSS (Flexbox & Grid)
 
-Backend
+Backend -
 Runtime: Node.js
-
 Framework: Express.js
-
 Database: MongoDB
-
 ODM: Mongoose
-
 Auth: bcrypt.js for hashing, Nodemailer for OTP verification
 
-Security
+Security -
 Environment variables are securely managed with .env and dotenv
-
 .env file is ignored in Git for protection
+
+------
+
+Screenshots:
+
+<img width="1920" height="1140" alt="Screenshot 2025-08-03 182707" src="https://github.com/user-attachments/assets/c562bbf8-147f-4dc1-ae62-7dd3f8882607" />
+<img width="1920" height="1140" alt="Screenshot 2025-08-03 182715" src="https://github.com/user-attachments/assets/68c574ed-6908-4221-a422-25fc10b6e34b" />
+<img width="1920" height="1140" alt="Screenshot 2025-08-03 182732" src="https://github.com/user-attachments/assets/02e014d4-0855-44ca-9132-2aa5327ac747" />
+
+----
 
 ⚙️ Getting Started
 To run the project locally:
@@ -86,6 +90,9 @@ Edit
 MONGO_URI=mongodb://localhost:27017/hackcheck
 GMAIL_USER=youremail@gmail.com
 GMAIL_APP_PASS=your-app-password
+
+----
+
 ▶️ Running the App
 Use two terminal tabs:
 
@@ -103,7 +110,9 @@ Edit
 npm start
 Opens at http://localhost:3000.
 
-📬 Contact
+---
+
+📬 Contact:
 Swaroop Vaidya
 📧 swaroopsvaidya@gmail.com
-🔗 LinkedIn
+🔗 LinkedIn : https://www.linkedin.com/in/swaroop-vaidya/
