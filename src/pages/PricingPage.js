@@ -1,18 +1,26 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import useIntersectionObserver from '../hooks/useIntersectionObserver';
 
 const PricingPage = () => {
+  const [headerRef, headerIsVisible] = useIntersectionObserver({ threshold: 0.1 });
+  const [gridRef, gridIsVisible] = useIntersectionObserver({ threshold: 0.1 });
+
   return (
-    // We reuse the 'about-container' class for consistent layout
     <div className="about-container">
-      <div className="about-header">
+      <div 
+        ref={headerRef}
+        className={`about-header animate-on-scroll ${headerIsVisible ? 'is-visible' : ''}`}
+      >
         <h1>Flexible Plans for Everyone</h1>
         <p className="about-subtitle">Choose the plan that's right for you. All plans come with our core security promise.</p>
       </div>
 
-      <div className="pricing-grid">
-        {/* Plan 1: Basic */}
-        <div className="pricing-card">
+      <div 
+        ref={gridRef}
+        className={`pricing-grid animate-on-scroll ${gridIsVisible ? 'is-visible' : ''}`}
+      >
+        <div className="pricing-card" style={{ transitionDelay: '200ms' }}>
           <h3 className="plan-name">Personal</h3>
           <div className="price-amount">
             <span className="dollar">$</span>10<span className="period">/mo</span>
@@ -26,8 +34,7 @@ const PricingPage = () => {
           <Link to="/checkout/personal" className="btn-outline">Choose Plan</Link>
         </div>
 
-        {/* Plan 2: Recommended */}
-        <div className="pricing-card recommended">
+        <div className="pricing-card recommended" style={{ transitionDelay: '400ms' }}>
           <div className="popular-badge">Most Popular</div>
           <h3 className="plan-name">Pro</h3>
           <div className="price-amount">
@@ -42,8 +49,7 @@ const PricingPage = () => {
           <Link to="/checkout/pro" className="btn-primary">Choose Plan</Link>
         </div>
 
-        {/* Plan 3: Enterprise */}
-        <div className="pricing-card">
+        <div className="pricing-card" style={{ transitionDelay: '600ms' }}>
           <h3 className="plan-name">Enterprise</h3>
           <div className="price-amount">
             <span className="dollar">$</span>20<span className="period">/mo</span>

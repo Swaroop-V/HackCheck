@@ -11,6 +11,15 @@ body {
   min-height: 100vh;
 }
 
+button,
+input,
+textarea,
+select {
+  font-family: inherit; /*  font from the parent (Figtree) */
+  font-size: 100%; 
+  margin: 0; 
+}
+
 .landing {
   min-height: 100vh;
   position: relative;
@@ -40,17 +49,17 @@ body {
 }
 
 .shield-icon {
-  font-size: 24px;
+  font-size: 18px;
 }
 
 .brand-text {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
 }
 
 .nav-links {
   display: flex;
-  gap: 32px;
+  gap: 88px; /* Increased from 32px for more spacing */
 }
 
 @media (max-width: 768px) {
@@ -62,71 +71,141 @@ body {
 .nav-link {
   background: none;
   border: none;
-  color: #9ca3af;
   cursor: pointer;
+  
+  /* 1. Makes the text white */
+  color: white; 
+  
+  /* 2. Removes the underline */
+  text-decoration: none; 
+
+  /* Polish & Hover Effect */
   font-size: 16px;
-  transition: color 0.3s;
+  font-weight: 520; /* A nice medium weight */
 }
 
-.nav-link:hover {
-  color: white;
-}
 
-.btn-primary {
-  background: #16a34a;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
+/* =================================
+   Modern Button Styles (Definitive)
+   ================================= */
+
+/* --- Primary & Submit Buttons (Green) --- */
+.btn-primary,
+.submit-btn {
+  /* Core Styling */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 90px;
+  border: 1px solid transparent;
   font-weight: 600;
+  color: white;
   cursor: pointer;
-  transition: background-color 0.3s;
+
+  /* Modern Gradient & Shadow */
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  box-shadow: 0 4px 15px -4px rgba(34, 197, 94, 0.4);
+
+  /* Smooth Transitions */
+  transition: all 0.2s ease-in-out;
 }
 
-.btn-primary:hover {
-  background: #15803d;
+/* Hover State: Lifts the button and makes it brighter */
+.btn-primary:hover:not(:disabled),
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px -4px rgba(34, 197, 94, 0.5);
+  background: linear-gradient(180deg, #4ade80 0%, #22c55e 100%);
 }
 
-.btn-primary:disabled {
-  background: #6b7280;
+/* Active (Click) State: Pushes the button down */
+.btn-primary:active:not(:disabled),
+.submit-btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 2px 8px -2px rgba(34, 197, 94, 0.6);
+}
+
+/* Disabled State: Flat and non-interactive */
+.btn-primary:disabled,
+.submit-btn:disabled {
+  background: #4b5563;
+  color: #9ca3af;
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-.btn-large {
-  padding: 16px 32px;
-}
 
+/* --- Outline Buttons (Transparent) --- */
 .btn-outline {
-  background: transparent;
-  color: white;
-  border: 1px solid #4b5563;
-  padding: 12px 24px;
-  border-radius: 8px;
+  /* Core Styling */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 80px;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.3s;
+  
+  /* Modern Border & Background */
+  background: transparent;
+  border: 1px solid #4b5563;
+  color: #d1d5db; /* A slightly brighter text color */
+  
+  /* Smooth Transitions */
+  transition: all 0.2s ease-in-out;
 }
 
+/* Hover State: Fills the button with the primary color */
 .btn-outline:hover {
-  border-color: #6b7280;
+  background-color: #16a34a;
+  border-color: #16a34a;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px -4px rgba(34, 197, 94, 0.4);
 }
+
+/* Active (Click) State: Pushes the button down */
+.btn-outline:active {
+  transform: translateY(1px) scale(0.98);
+  background-color: #15803d; /* A slightly darker green for the click */
+  border-color: #15803d;
+  box-shadow: none;
+}
+
+
+/* =======================================
+   Button Link Underline Fix
+   ======================================= */
+/* 
+  This rule targets any link (a) that also has a button class
+  and explicitly removes the text-decoration (underline).
+*/
+a.btn-primary,
+a.btn-outline,
+a.submit-btn,
+a.back-btn {
+  text-decoration: none;
+}
+
 
 .hero {
   position: relative;
   z-index: 10;
   max-width: 1200px;
   margin: 0 auto;
-  /* Adjust padding to remove top/bottom space, which is now on page-content */
-  padding: 0 24px 80px 24px;
-  min-height: calc(100vh - 80px); /* Ensure it takes up the screen height minus the navbar */
-  display: flex; /* Helps vertically center content if needed */
-  align-items: center; /* Vertically centers the hero-content */
+  padding: 0 24px; /* REMOVED bottom padding */
+  min-height: calc(100vh - 80px); 
+  display: flex;
+  align-items: center;
 }
 
 .hero-content {
   margin-top: 0px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 1fr;
   gap: 48px;
   align-items: center;
 }
@@ -183,18 +262,25 @@ body {
   position: relative;
   z-index: 10;
   width: 100%;
-  border-radius: 16px;
+  
+  /*  Forces the element into a circle */
+  border-radius: 50%; 
+  
+  /* These two lines ensure the image is a perfect circle  */
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+
+  /* The shadow now applies to the new circular shape */
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
 }
 
 .checker {
-  /* We use calc() to subtract the navbar's height (80px) from the full viewport height */
   min-height: calc(100vh - 80px); 
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  /* Explicitly set the background to ensure it matches the original design */
+  /*  set the background to ensure it matches the original design */
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
 }
 
@@ -289,9 +375,9 @@ body {
   background: #16a34a;
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 10px 24px;
+  border-radius: 80px;
+  font-weight: 400;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -323,12 +409,12 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* =================================
-   Result Box Styles (Definitive)
-   ================================= */
+/* =======================================
+   Definitive Result Box Style Fix
+   ======================================= */
 .result {
   margin-top: 24px;
-  padding: 10px;
+  padding: 16px;
   border-radius: 8px;
   border: 1px solid;
 }
@@ -359,13 +445,13 @@ body {
 }
 
 .result-icon {
-  font-size: 15px;
+  font-size: 16px;
 }
 
-/* This is the key fix for the text appearance */
 .result-text {
+  font-family: 'Figtree', sans-serif; 
   font-size: 16px;
-  font-weight: 500; /* Makes the text slightly bolder */
+  font-weight: 300; 
 }
 
 /* =======================================
@@ -392,7 +478,7 @@ body {
 .btn-primary,
 .btn-outline,
 .submit-btn {
-  font-size: 16px; /* or whatever size you prefer */
+  font-size: 16px; 
 }
 
 * {
@@ -407,14 +493,30 @@ body {
 .content-section {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 80px 24px;
+  padding: 80px 24px; 
   text-align: center;
 }
 
+.hero + .content-section {
+  padding-top: 40px; 
+}
+
+.section-divider {
+  border: none; 
+  height: 1px;  
+  /* semi-transparent dark grey that matches the theme */
+  background-color: rgba(75, 85, 99, 0.5); 
+  max-width: 1200px; /* Matches the max-width of the content sections */
+  margin: 0 auto;    /* Center the line on the page */
+}
+
+
 /* This rule targets any .content-section that directly follows another one */
 .content-section + .content-section {
-  margin-top: 0;
+  margin-top: 110px;
 }
+
+
 
 .section-title {
   font-size: 36px;
@@ -494,7 +596,7 @@ body {
   font-weight: 600;
   margin-bottom: 8px;
   padding-top: 16px;
-  /* Add padding to the left to move it away from the number */
+  /* Added padding to the left to move it away from the number */
   padding-left: 20px;
 }
 
@@ -503,26 +605,31 @@ body {
   z-index: 2;
   color: #9ca3af;
   line-height: 1.6;
-  /* Add padding to the left to match the title */
+  /* Added padding to the left to match the title */
   padding-left: 20px;
 }
 
-/* =================================
-   Footer Styles
-   ================================= */
+/* ======   Footer Styles ============== */
+
 .footer {
+  /* reduces the vertical padding */
+  padding: 15px; 
+  
   border-top: 1px solid #374151;
-  padding: 18px 24px;
   background: #0f0f0f;
+  position: relative;
+  z-index: 10;
 }
 
 .footer-content {
+  /* This reduces the space between the logo and the text */
+  gap: 16px; 
+
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
 }
 
 .footer-brand {
@@ -531,9 +638,8 @@ body {
   gap: 8px;
 }
 
-
 .footer-copyright {
-  color: #6b7280;
+  color: #e5e7ec;
   font-size: 14px;
 }
 
@@ -545,24 +651,24 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background: rgba(15, 15, 15, 0.8); /* Add a slight background for readability */
+  background: rgba(15, 15, 15, 0.8); /* Added a slight background for readability */
   backdrop-filter: blur(10px);
-  z-index: 1000; /* Ensure it's on top of other content */
+  z-index: 1000; /* should be on top of other content */
 }
 
-/* Use a class on nav-brand to make it a link */
+/* Used a class on nav-brand to make it a link */
 .nav-brand {
   text-decoration: none;
   color: white;
 }
 
 .page-content {
-  padding-top: 80px; /* Add padding to push content below the fixed navbar */
+  padding-top: 80px; /* Added padding to push content below the fixed navbar */
   position: relative;
   z-index: 5;
 }
 
-/* Make landing background cover everything */
+/* Made landing background cover everything */
 .app-container {
   min-height: 100vh;
   position: relative;
@@ -722,7 +828,6 @@ main.page-content {
   margin-bottom: 12px;
 }
 
-/* Recommended card styles */
 .pricing-card.recommended {
   border: 2px solid #22c55e;
   transform: scale(1.05);
@@ -735,14 +840,15 @@ main.page-content {
 
 .popular-badge {
   position: absolute;
-  top: 18px;
-  right: -35px;
+  /* Adjusted these values to push the ribbon further into the corner */
+  top: 28px;
+  right: -40px;
   background: #22c55e;
   color: white;
-  padding: 6px 32px;
+  padding: 8px 40px; /* Slightly increased padding for better balance */
   font-size: 14px;
   font-weight: 600;
-  transform: rotate(45deg);
+  transform: rotate(40deg);
   text-transform: uppercase;
 }
 
@@ -750,7 +856,7 @@ main.page-content {
    Validation & Success Styles
    ================================= */
 .error-text {
-  color: #f87171; /* A light red color */
+  color: #f87171;
   font-size: 14px;
   margin-top: 6px;
 }
@@ -761,7 +867,7 @@ main.page-content {
   border-radius: 16px;
   padding: 48px;
   color: #d1d5db;
-  /* === ADD THESE 3 LINES FOR ROBUST CENTERING === */
+  /* === ADDED THESE 3 LINES FOR ROBUST CENTERING === */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -798,8 +904,9 @@ main.page-content {
 }
 
 /* =================================
-   Checkout Page Styles
+   Checkout Page Styles (Upgraded)
    ================================= */
+
 .checkout-container {
   max-width: 800px;
   margin: 40px auto;
@@ -809,10 +916,10 @@ main.page-content {
 .checkout-card {
   display: flex;
   gap: 32px;
-  background: rgba(31, 41, 55, 0.3);
+  background: #1f2937; /* A slightly lighter, solid dark background */
   border-radius: 16px;
   border: 1px solid #374151;
-  padding: 32px;
+  overflow: hidden; /* Important for the new design */
   margin-bottom: 24px;
 }
 
@@ -822,59 +929,66 @@ main.page-content {
   }
 }
 
+/* --- ORDER SUMMARY STYLES --- */
 .order-summary {
   flex: 1;
-  border-right: 1px solid #374151;
-  padding-right: 32px;
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  background: rgba(17, 24, 39, 0.5); /* A very dark, subtle background */
+  padding: 32px;
 }
 
-@media (max-width: 768px) {
-  .order-summary {
-    border-right: none;
-    border-bottom: 1px solid #374151;
-    padding-right: 0;
-    padding-bottom: 32px;
-  }
-}
-
-.order-summary h2,
-.payment-form h2 {
-  font-size: 24px;
+.order-summary h2 {
+  font-size: 20px; /* Made slightly smaller for better balance */
   font-weight: 600;
   color: white;
   margin-bottom: 24px;
+  border-bottom: 1px solid #374151; /* Adds a nice separator line */
+  padding-bottom: 16px;
 }
 
-.plan-details,
-.total-due {
+.plan-details {
   display: flex;
   justify-content: space-between;
   font-size: 16px;
   color: #d1d5db;
   margin-bottom: 16px;
-}
-
-.total-due {
-  font-weight: bold;
-  color: white;
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid #4b5563;
+  flex-grow: 1; /* Pushes the "Total" to the bottom */
 }
 
 .plan-price {
   font-weight: 600;
+  color: white;
 }
 
+.total-due {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+  color: white;
+  background: rgba(31, 41, 55, 0.7); /* A distinct background for the total */
+  padding: 16px;
+  margin: 0 -32px -32px -32px; /* Negative margin to make it full-width */
+  border-top: 1px solid #374151;
+}
+
+/* --- THE REST OF THE STYLES (slightly adjusted) --- */
 .payment-form {
-  flex: 2;
-  padding-left: 32px;
+  flex: 1.5; /* Give slightly more space to the form */
+  padding: 32px;
 }
 
 @media (max-width: 768px) {
   .payment-form {
-    padding-left: 0;
+    padding-top: 0;
   }
+}
+
+.payment-form h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 24px;
 }
 
 .form-group {
@@ -893,7 +1007,7 @@ main.page-content {
   background: rgba(55, 65, 81, 0.5);
   border: 1px solid #4b5563;
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 9px 16px;
   color: white;
   font-size: 16px;
   outline: none;
@@ -911,8 +1025,8 @@ main.page-content {
 
 .submit-payment-btn {
   width: 100%;
-  padding: 16px 24px;
-  font-size: 18px;
+  padding: 10px 24px;
+  font-size: 16px;
 }
 
 /* =================================
@@ -930,7 +1044,7 @@ main.page-content {
 }
 
 .support-email-link {
-  color: #22c55e; /* Use brand's green color */
+  color: #22c55e; /* brand's green color */
   font-weight: 600;
   text-decoration: none;
   transition: opacity 0.3s;
@@ -940,9 +1054,119 @@ main.page-content {
   opacity: 0.8;
 }
 
-/*
-  This new rule targets ONLY the section we gave the extra class to.
-*/
 .extra-space-top {
-  margin-top: 60px; /* Adjust this value if you want more or less space */
+  margin-top: 560px; 
+}
+
+/* =================================
+   Auth Page Styles (Sign Up/Log In)
+   ================================= */
+.auth-switch {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.auth-switch-link {
+  color: #22c55e; /*  brand's green color */
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch-link:hover {
+  text-decoration: underline;
+}
+
+/* =================================
+   Reusable Modal Styles
+   ================================= */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000; /*  it should be on top of everything */
+  backdrop-filter: blur(5px);
+}
+
+.modal-content {
+  background: rgba(31, 41, 55, 0.9); /* Dark card background */
+  padding: 40px;
+  border-radius: 16px;
+  border: 1px solid #374151;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+  /* Animation for appearing */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: white;
+  font-size: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px auto;
+}
+
+.modal-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.modal-message {
+  font-size: 16px;
+  color: #d1d5db;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =======================================================
+   INTERSECTION OBSERVER ANIMATION STYLES
+   ======================================================= */
+
+/* 
+  The initial "hidden" state for any element to animate.
+  It's invisible and slightly moved down.
+*/
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 2s ease-out, transform 2s ease-out;
+}
+
+/* 
+  The "visible" state. the element
+  will smoothly transition to being fully visible and in its
+  final position.
+*/
+.animate-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }

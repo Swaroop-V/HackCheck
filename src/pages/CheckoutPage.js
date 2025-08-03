@@ -15,70 +15,54 @@ const CheckoutPage = () => {
   const [errors, setErrors] = useState({});
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // --- NEW: Enhanced handleChange to handle the auto-slash ---
-    // --- NEW: handleChange now PREVENTS invalid input in real-time ---
   const handleChange = (e) => {
     const { name, value } = e.target;
     let sanitizedValue = value;
 
-    // 1. For name, remove anything that is not a letter or space
     if (name === 'name') {
       sanitizedValue = value.replace(/[^A-Za-z\s]/ig, '');
     }
 
-    // 2. For numeric fields (cardNumber, cvc), remove anything that is not a digit
     if (name === 'cardNumber' || name === 'cvc') {
       sanitizedValue = value.replace(/\D/g, '');
     }
 
-    // 3. For expiry, handle the auto-slash and only allow digits, space, and slash
     if (name === 'expiry') {
-      // First, remove any invalid characters
       sanitizedValue = value.replace(/[^0-9\s/]/g, '');
 
-      // Then, auto-add slash after 2 digits
       if (sanitizedValue.length === 2 && formData.expiry.length === 1) {
         sanitizedValue = sanitizedValue + ' / ';
       }
-      // Allow deleting the slash and space
       if (sanitizedValue.length === 2 && formData.expiry.length === 5) {
         sanitizedValue = sanitizedValue.slice(0, 2);
       }
     }
     
-    // Update the state with the sanitized value
     setFormData({ ...formData, [name]: sanitizedValue });
   };
 
-  // --- NEW: Enhanced validateForm with stricter rules ---
   const validateForm = () => {
     const newErrors = {};
 
-    // 1. Name validation: Only allows letters and spaces
     if (!/^[A-Za-z\s]+$/.test(formData.name)) {
       newErrors.name = 'Name can only contain letters and spaces.';
     }
 
-    // 2. Card Number validation (remains the same)
     if (!/^\d{16}$/.test(formData.cardNumber.replace(/\s/g, ''))) {
       newErrors.cardNumber = 'Card number must be 16 digits.';
     }
 
-    // 3. Expiry Date validation
     if (!/^(0[1-9]|1[0-2])\s\/\s\d{2}$/.test(formData.expiry)) {
       newErrors.expiry = 'Format must be MM / YY.';
     } else {
-      // If format is correct, check the year range
       const [month, year] = formData.expiry.split(' / ');
       const fullYear = parseInt('20' + year);
       
-      // 3b. Year Range validation
       if (fullYear < 2025 || fullYear > 2030) {
         newErrors.expiry = 'Year must be between 2025 and 2030.';
       }
     }
 
-    // 4. CVC validation: Must be exactly 3 digits
     if (!/^\d{3}$/.test(formData.cvc)) {
       newErrors.cvc = 'CVC must be exactly 3 digits.';
     }
@@ -96,7 +80,6 @@ const CheckoutPage = () => {
     }
   };
 
-  // The rest of the component (JSX) remains the same as before
   if (isSuccess) {
     return (
         <div className="checkout-container">
@@ -104,7 +87,7 @@ const CheckoutPage = () => {
             <div className="success-icon">✓</div>
             <h2>Congratulations!</h2>
             <p>Your subscription to the <strong>{plan.name}</strong> has been successfully processed.</p>
-            <p>Thank you for choosing LeakGuard.</p>
+            <p>Thank you for choosing HackCheck.</p>
             <Link to="/" className="btn-primary" style={{ marginTop: '24px' }}>
                 Back to Home
             </Link>

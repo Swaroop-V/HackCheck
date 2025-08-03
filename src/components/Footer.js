@@ -6,10 +6,10 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-brand">
           <span className="shield-icon">🛡️</span>
-          <span className="brand-text">LeakGuard</span>
+          <span className="brand-text">HackCheck</span>
         </div>
         <div className="footer-copyright">
-          © 2025 LeakGuard. All rights reserved.
+          © 2025 HackCheck. All rights reserved.
         </div>
       </div>
     </footer>
