@@ -18,33 +18,37 @@ HackCheck demonstrates a complete full-stack workflow with a focus on security a
 
 👤 User Authentication:
 
-Email & password sign-up and login
-Password hashing with bcrypt.js
-6-digit OTP email verification via Nodemailer
-🔐 Persistent Login Sessions using sessionStorage and React Context API
-🌓 Dynamic UI: Auth-based navigation with a responsive dark-themed interface
-💳 Simulated E-Commerce Flow: Pricing tiers, checkout UI, and live form validation
-🎯 Animations: Smooth scroll-triggered animations using Intersection Observer API 
+1. Email & password sign-up and login.
+2. Password hashing with bcrypt.js
+3. 6-digit OTP email verification via Nodemailer
+4. 🔐 Persistent Login Sessions using sessionStorage and React Context API
+5. 🌓 Dynamic UI: Auth-based navigation with a responsive dark-themed interface
+6. 💳 Simulated E-Commerce Flow: Pricing tiers, checkout UI, and live form validation
+7. 🎯 Animations: Smooth scroll-triggered animations using Intersection Observer API 
 
 -------------------------------------------------
 
 🛠️ Tech Stack : 
+
 Frontend -
-Framework: React.js
-Routing: React Router v6
-State Management: React Hooks (useState, useContext)
-Styling: Pure CSS (Flexbox & Grid)
+
+1. Framework: React.js
+2. Routing: React Router v6
+3. State Management: React Hooks (useState, useContext)
+4. Styling: Pure CSS (Flexbox & Grid)
 
 Backend -
-Runtime: Node.js
-Framework: Express.js
-Database: MongoDB
-ODM: Mongoose
-Auth: bcrypt.js for hashing, Nodemailer for OTP verification
+
+1. Runtime: Node.js
+2. Framework: Express.js
+3. Database: MongoDB
+4. ODM: Mongoose
+5. Auth: bcrypt.js for hashing, Nodemailer for OTP verification
 
 Security -
-Environment variables are securely managed with .env and dotenv
-.env file is ignored in Git for protection
+
+1. Environment variables are securely managed with .env and dotenv
+2. .env file is ignored in Git for protection
 
 ------
 
@@ -96,6 +100,7 @@ GMAIL_APP_PASS=your-app-password
 ----
 
 ▶️ Running the App
+
 Use two terminal tabs:
 
 1. Start the Backend Server
@@ -115,6 +120,7 @@ Opens at http://localhost:3000.
 ---
 
 📬 Contact:
+
 Swaroop Vaidya
 📧 swaroopsvaidya@gmail.com
 🔗 LinkedIn : https://www.linkedin.com/in/swaroop-vaidya/
