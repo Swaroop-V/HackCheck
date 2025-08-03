@@ -60,41 +60,38 @@ Screenshots:
 
 ----
 
-⚙️ Getting Started
+⚙️ Getting Started:
 To run the project locally:
 
-Prerequisites
-Node.js (v14+)
+Prerequisites -
+1. Node.js (v14+)
+2. npm
+3. MongoDB installed and running locally
 
-npm
+---
 
-MongoDB installed and running locally
+Installation Steps:
 
-Installation Steps
-Clone the Repository
+1. Clone the Repository:
 
-bash
-Copy
-Edit
 git clone https://github.com/your-github-username/your-repo-name.git
+
 cd your-repo-name
-Install Dependencies
 
-bash
-Copy
-Edit
+
+2. Install Dependencies:
+
 npm install
-Configure Environment Variables
 
-Create a .env file in the root directory
+3. Configure Environment Variables:
 
-Add the following values:
+1. Create a .env file in the root directory
+2. Add the following values:
 
-env
-Copy
-Edit
 MONGO_URI=mongodb://localhost:27017/hackcheck
+
 GMAIL_USER=youremail@gmail.com
+
 GMAIL_APP_PASS=your-app-password
 
 ----
@@ -104,17 +101,15 @@ GMAIL_APP_PASS=your-app-password
 Use two terminal tabs:
 
 1. Start the Backend Server
-bash
-Copy
-Edit
+
 npm run server
+
 Runs on http://localhost:5000 — should show MongoDB Connected....
 
 2. Start the Frontend (New Terminal)
-bash
-Copy
-Edit
+
 npm start
+
 Opens at http://localhost:3000.
 
 ---
