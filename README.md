@@ -8,7 +8,8 @@ A full-stack web application designed to help users **securely check** if their 
 ![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge\&logo=mongodb\&logoColor=white)
 
 ---
-✨ Features
+✨ Features:
+
 HackCheck demonstrates a complete full-stack workflow with a focus on security and user experience:
 🔒 Secure Password Checking using the k-Anonymity model via the Have I Been Pwned API.
 
