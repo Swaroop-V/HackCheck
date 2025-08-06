@@ -44,17 +44,47 @@ app.post('/api/check-password', async (req, res) => {
     const sha1 = crypto.createHash('sha1').update(password).digest('hex').toUpperCase();
     const prefix = sha1.substring(0, 5);
     const suffix = sha1.substring(5);
+
     const response = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`);
     const data = await response.text();
-    const found = data.split('\n').some(line => {
+
+    let found = false;
+    let count = 0;
+
+    // Split the text response into lines
+    const lines = data.split('\n');
+    
+    // Find the line that matches our suffix
+    const matchingLine = lines.find(line => {
       const [hashSuffix] = line.split(':');
       return hashSuffix.trim().toUpperCase() === suffix;
     });
+
+    if (matchingLine) {
+      found = true;
+      // If a match is found, parse the count
+      count = parseInt(matchingLine.split(':')[1], 10);
+    }
+    
+    // Create the dynamic message
+    let message = 'This password is safe and was not found in any known breaches.';
+    let subMessage = 'Good job!'; // Default sub-message for safe passwords
+
+    if (found) {
+      // If found, create the detailed messages
+      message = `This password has been seen ${count.toLocaleString()} times in data breaches.`;
+      subMessage = 'Please choose a more secure one.';
+    }
+
+    // Send the structured response
     res.json({
       leaked: found,
-      message: found ? 'Password has been leaked!' : 'Password is safe.',
+      count: count,
+      message: message,
+      subMessage: subMessage, // Add the new subMessage to the response
     });
-  } catch (err) {
+  }
+    catch (err) {
     res.status(500).json({ leaked: false, message: `Server Error: ${err.message}` });
   }
 });
