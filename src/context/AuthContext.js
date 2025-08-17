@@ -1,31 +1,49 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
-// Create the context
+// 1. Create the context
 const AuthContext = createContext(null);
 
-// Create the provider component
+// 2. Create the Provider Component
 export const AuthProvider = ({ children }) => {
-  // Initialize state from sessionStorage, or default to false
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return sessionStorage.getItem('isAuthenticated') === 'true';
+  // Initialize state by safely reading from sessionStorage
+  const [user, setUser] = useState(() => {
+    try {
+      const storedUser = sessionStorage.getItem('user');
+      return storedUser ? JSON.parse(storedUser) : null;
+    } catch (error) {
+      console.error("Failed to parse user from sessionStorage on initial load");
+      return null;
+    }
   });
 
-  // Effect to update sessionStorage whenever the auth state changes
-  useEffect(() => {
-    sessionStorage.setItem('isAuthenticated', isAuthenticated);
-  }, [isAuthenticated]);
+  const isAuthenticated = !!user;
 
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
+  // Login function updates state and sessionStorage
+  const login = (userData) => {
+    if (userData && typeof userData === 'object') {
+      try {
+        sessionStorage.setItem('user', JSON.stringify(userData));
+        setUser(userData);
+      } catch (error) {
+        console.error("Failed to save user to sessionStorage", error);
+      }
+    }
+  };
+
+  // Logout function clears state and sessionStorage
+  const logout = () => {
+    sessionStorage.removeItem('user');
+    setUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Create a custom hook for easy access to the context
+// 3. Create and EXPORT the custom hook for easy access
 export const useAuth = () => {
   return useContext(AuthContext);
 };

@@ -7,21 +7,50 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const path = require('path'); // Required for serving static files
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Allow requests from your React app
+  credentials: true                // Allow cookies to be sent and received
+}));
+
 app.use(express.json());
+app.use(cookieParser());
+
 
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/leakguard', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB Connected...'))
   .catch(err => console.log(err));
 
+
+// 5. Define your schemas and models.
+// In /server/index.js
+
 const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: true },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 });
+
+// This function will run BEFORE a user document is saved
+UserSchema.pre('save', async function (next) {
+  // Only hash the password if it has been modified (or is new)
+  if (!this.isModified('password')) {
+    return next();
+  }
+
+  // Hash the password with a salt
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
 const User = mongoose.model('User', UserSchema);
+
 const otpStore = {};
 
 const transporter = nodemailer.createTransport({
@@ -32,6 +61,26 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// ===================================
+//   AUTHENTICATION MIDDLEWARE
+// ===================================
+const protect = async (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Attach the user to the request object
+    req.user = await User.findById(decoded.user.id).select('-password');
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Not authorized, token failed' });
+  }
+};
 
 
 
@@ -98,10 +147,14 @@ app.post('/api/signup/initiate', async (req, res) => {
   if (existingUser) {
     return res.status(400).json({ message: 'An account with this email already exists.' });
   }
-  const salt = await bcrypt.genSalt(10);
-  const passwordHash = await bcrypt.hash(password, salt);
+
   const otp = crypto.randomInt(100000, 999999).toString();
-  otpStore[email] = { passwordHash, otp, expiresAt: Date.now() + 10 * 60 * 1000 };
+  otpStore[email] = {
+    plainPassword: password, // Storing the plain password
+    otp,
+    expiresAt: Date.now() + 10 * 60 * 1000,
+  };
+
   const mailOptions = {
     from: `"HackCheck Support" <${process.env.GMAIL_USER}>`,
     to: email,
@@ -134,8 +187,13 @@ app.post('/api/signup/verify', async (req, res) => {
     return res.status(400).json({ message: 'Invalid OTP.' });
   }
   try {
-    const newUser = new User({ email: email, password: tempUser.passwordHash });
+    // We now pass the plain password from otpStore. The pre('save') hook will hash it.
+    const newUser = new User({
+      email: email,
+      password: otpStore[email].plainPassword, // Assuming you stored the plain password
+    });
     await newUser.save();
+    
     delete otpStore[email];
     res.status(201).json({ message: 'Account created successfully!' });
   } catch (error) {
@@ -143,6 +201,10 @@ app.post('/api/signup/verify', async (req, res) => {
   }
 });
 
+
+
+//   UPDATED LOGIN ENDPOINT
+// ===================================
 
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
@@ -154,20 +216,198 @@ app.post('/api/login', async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
+      console.log(`Login attempt failed: No user found for email ${email}`);
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log(`Login attempt failed: Password incorrect for email ${email}`);
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    res.status(200).json({ message: 'Login successful!' });
+    // Login successful! Create the JWT.
+    const payload = { user: { id: user.id } };
 
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' },
+      (err, token) => {
+        if (err) throw err;
+        
+        console.log(`Login successful for ${email}`);
+        
+        res.cookie('token', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+        });
+        
+        res.status(200).json({
+          message: 'Login successful!',
+          user: { id: user.id, email: user.email },
+        });
+      }
+    );
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login server error:", error);
     res.status(500).json({ message: 'Server error during login.' });
   }
+});
+
+// ===================================
+//   DASHBOARD ENDPOINT (PROTECTED)
+// ===================================
+app.get('/api/dashboard', protect, (req, res) => {
+  // Because of the 'protect' middleware, we have access to req.user
+  // For now, we'll just send back a welcome message with the user's email.
+  res.json({
+    message: `Welcome to your dashboard, ${req.user.email}!`,
+    // You could fetch and send real user activity data here
+    activity: [
+      { id: 1, action: 'Checked password "password123"', date: new Date() },
+      { id: 2, action: 'Viewed Security Tips', date: new Date() },
+    ]
+  });
+});
+
+// ===================================
+//   PASSWORD RESET - PHASE 1: REQUEST
+// ===================================
+app.post('/api/forgot-password', async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ message: 'Please provide an email address.' });
+  }
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      // For security, we don't reveal if the email exists.
+      return res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+    }
+
+    // 1. Generate a random token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+
+    // 2. Hash the token before saving it to the database
+    user.passwordResetToken = crypto
+      .createHash('sha256')
+      .update(resetToken)
+      .digest('hex');
+
+    // 3. Set an expiry time (e.g., 10 minutes)
+    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    await user.save();
+
+    // 4. Create the reset URL and send the email (containing the un-hashed token)
+    const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+
+    const mailOptions = {
+      from: `"HackCheck Support" <${process.env.GMAIL_USER}>`,
+      to: user.email,
+      subject: 'HackCheck Password Reset Request',
+      html: `
+        <p>You requested a password reset. Please click the link below to reset your password.</p>
+        <a href="${resetURL}">Reset Password</a>
+        <p>This link will expire in 10 minutes.</p>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
+
+// ===================================
+//   PASSWORD RESET - PHASE 2: RESET
+// ===================================
+app.post('/api/reset-password/:token', async (req, res) => {
+  const { password } = req.body;
+  
+  // 1. Hash the token from the URL to match the one in the database
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  try {
+    // 2. Find the user by the hashed token and check if it has not expired
+    const user = await User.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Token is invalid or has expired.' });
+    }
+
+    // 3. If token is valid, set the new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    // 4. Clear the reset token fields
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+
+    await user.save();
+
+    res.status(200).json({ message: 'Password has been successfully reset.' });
+
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
+// ... after your other API routes ...
+
+// ===================================
+//   USER PROFILE - CHANGE PASSWORD (PROTECTED)
+// ===================================
+app.post('/api/user/change-password', protect, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'Please provide both the current and new password.' });
+  }
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) { /* ... */ }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) { /* ... */ }
+
+    // THE FIX: We set the plain new password. The middleware will hash it on save.
+    user.password = newPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully.' });
+  } catch (error) {
+    console.error("Change Password Error:", error);
+    res.status(500).json({ message: 'Server error.' });
+  }
+});
+
+// ===================================
+//   LOGOUT ENDPOINT
+
+app.post('/api/logout', (req, res) => {
+  // This is a more forceful way to clear the cookie
+  res.clearCookie('token', { 
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/', // Explicitly set the path to the root
+  });
+  res.status(200).json({ message: 'Logged out successfully.' });
 });
 
 const PORT = process.env.PORT || 5000;

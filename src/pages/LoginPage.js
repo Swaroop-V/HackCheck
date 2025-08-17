@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext'; // Import the useAuth hook
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); 
+  const { login } = useAuth(); // Get the login function from our context
+
+  // In /src/pages/LoginPage.js
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,14 +24,18 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (!response.ok) {
+        // If the login fails, throw an error to be caught by the catch block
         throw new Error(data.message || 'Login failed.');
       }
       
-      login();
-      
-      navigate('/check');
+      // THIS IS THE CRITICAL PART:
+      // If the response is OK, we know the login was successful.
+      // We update the context and then navigate.
+      login(data.user);
+      navigate('/dashboard'); // Navigate to the dashboard on success
 
     } catch (error) {
+      // This block only runs if the fetch fails or if we threw an error above
       setMessage(error.toString());
     }
   };
@@ -58,6 +64,12 @@ const LoginPage = () => {
               Log In
             </button>
           </form>
+
+          <div style={{ textAlign: 'center', marginTop: '12px' }}>
+            <Link to="/forgot-password" className="auth-switch-link" style={{ fontSize: '14px' }}>
+              Forgot Password?
+            </Link>
+          </div>
 
           {message && <p style={{ color: 'red', textAlign: 'center', marginTop: '1rem' }}>{message}</p>}
 
