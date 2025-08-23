@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom'; // <-- ADD THIS LINE
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -8,10 +9,9 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        // Add the credentials option here
+      try {        
         const response = await fetch('/api/dashboard', {
-          credentials: 'include', // <-- THIS IS THE CRITICAL FIX
+          credentials: 'include', 
         });
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data. Please log in again.');
@@ -28,8 +28,8 @@ const DashboardPage = () => {
   return (
     <div className="about-container">
       <div className="about-header">
-        <h1>User Dashboard</h1>
-        {user && <p className="about-subtitle">Welcome, {user.email}!</p>}
+        <h1>Dashboard</h1>
+        {user && <p className="about-subtitle">Welcome, {user.username}!</p>}
       </div>
 
       <div className="about-content">
@@ -48,6 +48,14 @@ const DashboardPage = () => {
             <p>Loading activity...</p>
           )}
         </section>
+
+        <div className="about-cta">
+          <h3>Ready to secure your accounts?</h3>
+          <p>Check your most-used passwords now and take the first step towards better protection.</p>
+          <Link to="/check" className="btn-primary btn-large">
+            Check a Password Now
+          </Link>
+        </div>
       </div>
     </div>
   );

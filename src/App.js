@@ -2,12 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-// Import your components
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Import ALL your page components
 import HomePage from './pages/HomePage';
 import CheckerPage from './pages/CheckerPage';
 import AboutPage from './pages/AboutPage';
@@ -58,7 +56,7 @@ function App() {
               } 
             />
              <Route 
-              path="/profile" // 2. Add the new protected route
+              path="/profile" 
               element={<ProtectedRoute> <ProfilePage /></ProtectedRoute>} 
             />
           </Routes>

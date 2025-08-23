@@ -8,7 +8,7 @@ const ProtectedRoute = ({ children }) => {
 
   if (!isAuthenticated) {
     // Redirect them to the /login page, but save the current location they were
-    // trying to go to. This allows us to send them back after they log in.
+    // trying to go to. This allows to send them back after they log in.
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

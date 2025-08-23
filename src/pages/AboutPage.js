@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import useIntersectionObserver from '../hooks/useIntersectionObserver'; // 1. Import the hook
+import useIntersectionObserver from '../hooks/useIntersectionObserver'; 
 
 const AboutPage = () => {
   const [containerRef, containerIsVisible] = useIntersectionObserver({ threshold: 0.1 });

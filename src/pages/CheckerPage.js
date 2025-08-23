@@ -11,7 +11,6 @@ function CheckerPage() {
 
   const [cardRef, cardIsVisible] = useIntersectionObserver({ threshold: 0.1 });
 
-  // In /src/pages/CheckerPage.js
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,16 +49,9 @@ function CheckerPage() {
     }
   };
 
-
-
   return (
     <div className="checker">
       <div className="checker-container">
-        {/*
-          =======================================================
-            THE FIX: The ref and dynamic classes MUST be on this div.
-          =======================================================
-        */}
         <div 
           ref={cardRef}
           className={`checker-card animate-on-scroll ${cardIsVisible ? 'is-visible' : ''}`}

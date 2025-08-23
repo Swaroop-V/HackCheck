@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  /* This is now the ONLY place where the global font is set */
+  /* global font is set */
   font-family: 'Figtree', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Modal from '../components/Modal'; // 1. Import your reusable Modal component
+import Modal from '../components/Modal'; 
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [showSuccessModal, setShowSuccessModal] = useState(false); // 2. Add state for the modal
+  const [showSuccessModal, setShowSuccessModal] = useState(false); 
   const { token } = useParams();
   const navigate = useNavigate();
 
@@ -32,12 +32,11 @@ const ResetPasswordPage = () => {
   // 4. This function will be called when the modal's button is clicked
   const handleModalClose = () => {
     setShowSuccessModal(false);
-    navigate('/login'); // Navigate to the login page after closing
+    navigate('/login'); 
   };
 
   return (
     <>
-      {/* 5. Place the Modal component here, ready to be shown */}
       <Modal 
         show={showSuccessModal}
         title="Password Reset!"

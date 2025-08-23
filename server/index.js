@@ -12,41 +12,27 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 app.use(cors({
-  origin: 'http://localhost:3000', // Allow requests from your React app
-  credentials: true                // Allow cookies to be sent and received
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true                // Allows cookies to be sent and received
 }));
 
 app.use(express.json());
 app.use(cookieParser());
 
+console.log('Attempting to connect with MONGO_URI:', process.env.MONGO_URI);
 
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/leakguard', { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB Connected...'))
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('MongoDB Atlas Connected...'))
   .catch(err => console.log(err));
 
 
-// 5. Define your schemas and models.
-// In /server/index.js
-
 const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true }, 
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: true },
   passwordResetToken: String,
   passwordResetExpires: Date,
-});
-
-// This function will run BEFORE a user document is saved
-UserSchema.pre('save', async function (next) {
-  // Only hash the password if it has been modified (or is new)
-  if (!this.isModified('password')) {
-    return next();
-  }
-
-  // Hash the password with a salt
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
 });
 
 const User = mongoose.model('User', UserSchema);
@@ -82,8 +68,6 @@ const protect = async (req, res, next) => {
   }
 };
 
-
-
 app.post('/api/check-password', async (req, res) => {
   const { password } = req.body;
   if (!password) {
@@ -103,7 +87,7 @@ app.post('/api/check-password', async (req, res) => {
     // Split the text response into lines
     const lines = data.split('\n');
     
-    // Find the line that matches our suffix
+    // Find the line that matches the suffix
     const matchingLine = lines.find(line => {
       const [hashSuffix] = line.split(':');
       return hashSuffix.trim().toUpperCase() === suffix;
@@ -120,12 +104,12 @@ app.post('/api/check-password', async (req, res) => {
     let subMessage = 'Good job!'; // Default sub-message for safe passwords
 
     if (found) {
-      // If found, create the detailed messages
+      // If found, creates the detailed messages
       message = `This password has been seen ${count.toLocaleString()} times in data breaches.`;
       subMessage = 'Please choose a more secure one.';
     }
 
-    // Send the structured response
+    // Sends the structured response
     res.json({
       leaked: found,
       count: count,
@@ -139,21 +123,27 @@ app.post('/api/check-password', async (req, res) => {
 });
 
 app.post('/api/signup/initiate', async (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required.' });
+  const { username, email, password } = req.body; 
+  if (!username || !email || !password) { 
+    return res.status(400).json({ message: 'Username, email, and password are required.' });
   }
-  const existingUser = await User.findOne({ email });
+
+  // Check if username OR email already exists
+  const existingUser = await User.findOne({ $or: [{ email }, { username }] });
   if (existingUser) {
-    return res.status(400).json({ message: 'An account with this email already exists.' });
+    return res.status(400).json({ message: 'A user with that email or username already exists.' });
   }
+
+  delete otpStore[email];
 
   const otp = crypto.randomInt(100000, 999999).toString();
   otpStore[email] = {
-    plainPassword: password, // Storing the plain password
+    username, 
+    plainPassword: password,
     otp,
     expiresAt: Date.now() + 10 * 60 * 1000,
   };
+
 
   const mailOptions = {
     from: `"HackCheck Support" <${process.env.GMAIL_USER}>`,
@@ -186,11 +176,17 @@ app.post('/api/signup/verify', async (req, res) => {
   if (tempUser.otp !== otp) {
     return res.status(400).json({ message: 'Invalid OTP.' });
   }
-  try {
-    // We now pass the plain password from otpStore. The pre('save') hook will hash it.
+   try {
+    const tempUser = otpStore[email];
+    
+    // Hash the password explicitly here
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(tempUser.plainPassword, salt);
+
     const newUser = new User({
+      username: tempUser.username,
       email: email,
-      password: otpStore[email].plainPassword, // Assuming you stored the plain password
+      password: passwordHash, // Save the hashed password
     });
     await newUser.save();
     
@@ -226,7 +222,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    // Login successful! Create the JWT.
+    // Login successful! Creates the JWT.
     const payload = { user: { id: user.id } };
 
     jwt.sign(
@@ -244,9 +240,10 @@ app.post('/api/login', async (req, res) => {
         });
         
         res.status(200).json({
-          message: 'Login successful!',
-          user: { id: user.id, email: user.email },
+        message: 'Login successful!',
+        user: { id: user.id, email: user.email, username: user.username },
         });
+
       }
     );
   } catch (error) {
@@ -258,12 +255,11 @@ app.post('/api/login', async (req, res) => {
 // ===================================
 //   DASHBOARD ENDPOINT (PROTECTED)
 // ===================================
-app.get('/api/dashboard', protect, (req, res) => {
-  // Because of the 'protect' middleware, we have access to req.user
-  // For now, we'll just send back a welcome message with the user's email.
+app.get('/api/dashboard', protect, async (req, res) => {
+  
   res.json({
-    message: `Welcome to your dashboard, ${req.user.email}!`,
-    // You could fetch and send real user activity data here
+    message: `Welcome, ${req.user.username}!`,
+    
     activity: [
       { id: 1, action: 'Checked password "password123"', date: new Date() },
       { id: 2, action: 'Viewed Security Tips', date: new Date() },
@@ -283,25 +279,25 @@ app.post('/api/forgot-password', async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      // For security, we don't reveal if the email exists.
+      // For security, not going to reveal if the email exists.
       return res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
     }
 
-    // 1. Generate a random token
+    // 1. Generates a random token
     const resetToken = crypto.randomBytes(32).toString('hex');
 
-    // 2. Hash the token before saving it to the database
+    // 2. Hashes the token before saving it to the database
     user.passwordResetToken = crypto
       .createHash('sha256')
       .update(resetToken)
       .digest('hex');
 
-    // 3. Set an expiry time (e.g., 10 minutes)
+    // 3. Sets an expiry time (e.g., 10 minutes)
     user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     await user.save();
 
-    // 4. Create the reset URL and send the email (containing the un-hashed token)
+    // 4. Creates the reset URL and send the email (containing the un-hashed token)
     const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
 
     const mailOptions = {
@@ -324,21 +320,19 @@ app.post('/api/forgot-password', async (req, res) => {
   }
 });
 
-
 // ===================================
-//   PASSWORD RESET - PHASE 2: RESET
+//   PASSWORD RESET - PHASE 2: RESET (CORRECTED)
 // ===================================
 app.post('/api/reset-password/:token', async (req, res) => {
   const { password } = req.body;
   
-  // 1. Hash the token from the URL to match the one in the database
   const hashedToken = crypto
-    .createHash('sha256')
+    .createHash('sha26')
     .update(req.params.token)
     .digest('hex');
 
   try {
-    // 2. Find the user by the hashed token and check if it has not expired
+    // THIS IS THE MISSING LINE THAT FIXES THE BUG
     const user = await User.findOne({
       passwordResetToken: hashedToken,
       passwordResetExpires: { $gt: Date.now() },
@@ -348,28 +342,24 @@ app.post('/api/reset-password/:token', async (req, res) => {
       return res.status(400).json({ message: 'Token is invalid or has expired.' });
     }
 
-    // 3. If token is valid, set the new password
+    // Hash the new password explicitly
     const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
+    user.password = await bcrypt.hash(password, salt); // Corrected to use the password from req.body
 
-    // 4. Clear the reset token fields
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
 
     await user.save();
-
     res.status(200).json({ message: 'Password has been successfully reset.' });
-
   } catch (error) {
     console.error("Reset Password Error:", error);
     res.status(500).json({ message: 'Server error.' });
   }
 });
 
-// ... after your other API routes ...
 
 // ===================================
-//   USER PROFILE - CHANGE PASSWORD (PROTECTED)
+//   USER PROFILE - CHANGE PASSWORD (CORRECTED)
 // ===================================
 app.post('/api/user/change-password', protect, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
@@ -380,13 +370,18 @@ app.post('/api/user/change-password', protect, async (req, res) => {
 
   try {
     const user = await User.findById(req.user.id);
-    if (!user) { /* ... */ }
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) { /* ... */ }
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Incorrect current password.' });
+    }
 
-    // THE FIX: We set the plain new password. The middleware will hash it on save.
-    user.password = newPassword;
+    // Hash the new password explicitly
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
 
     res.status(200).json({ message: 'Password updated successfully.' });
@@ -400,15 +395,23 @@ app.post('/api/user/change-password', protect, async (req, res) => {
 //   LOGOUT ENDPOINT
 
 app.post('/api/logout', (req, res) => {
-  // This is a more forceful way to clear the cookie
   res.clearCookie('token', { 
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    path: '/', // Explicitly set the path to the root
+    path: '/', 
   });
   res.status(200).json({ message: 'Logged out successfully.' });
 });
+
+app.use(express.static(path.join(__dirname, '..', 'build')));
+
+// The "catch-all" handler: for any request that doesn't match an API route above,
+// send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+});
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

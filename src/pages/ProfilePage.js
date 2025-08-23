@@ -18,11 +18,11 @@ const ProfilePage = () => {
     setError('');
 
     try {
-      // THIS IS THE CRITICAL FIX: The URL MUST be relative for the proxy to work.
+      // CRITICAL: URL MUST be relative for the proxy to work.
       const response = await fetch('/api/user/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Important: we need to send the auth cookie
+        credentials: 'include', // Important:  need to send the auth cookie
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = await response.json();
@@ -42,7 +42,7 @@ const ProfilePage = () => {
       className={`about-container animate-on-scroll ${containerIsVisible ? 'is-visible' : ''}`}
     >
       <div className="about-header">
-        <h1>User Profile</h1>
+        <h1>Profile</h1>
         <p className="about-subtitle">Manage your account settings.</p>
       </div>
 

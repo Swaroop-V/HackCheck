@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Import the useAuth hook
+import { useAuth } from '../context/AuthContext'; 
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
-  const { login } = useAuth(); // Get the login function from our context
-
-  // In /src/pages/LoginPage.js
+  const { login } = useAuth(); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,14 +26,13 @@ const LoginPage = () => {
         throw new Error(data.message || 'Login failed.');
       }
       
-      // THIS IS THE CRITICAL PART:
-      // If the response is OK, we know the login was successful.
-      // We update the context and then navigate.
+      // If the response is OK, i will know the login was successful.
+      // updates the context and then navigate.
       login(data.user);
       navigate('/dashboard'); // Navigate to the dashboard on success
 
     } catch (error) {
-      // This block only runs if the fetch fails or if we threw an error above
+      // This block only runs if the fetch fails or if i threw an error above
       setMessage(error.toString());
     }
   };

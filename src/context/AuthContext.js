@@ -1,11 +1,10 @@
 import React, { createContext, useState, useContext } from 'react';
 
-// 1. Create the context
 const AuthContext = createContext(null);
 
-// 2. Create the Provider Component
+// 2. Creates the Provider Component
 export const AuthProvider = ({ children }) => {
-  // Initialize state by safely reading from sessionStorage
+  // Initializes state by safely reading from sessionStorage
   const [user, setUser] = useState(() => {
     try {
       const storedUser = sessionStorage.getItem('user');
