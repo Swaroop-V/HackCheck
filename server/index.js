@@ -404,13 +404,13 @@ app.post('/api/logout', (req, res) => {
   res.status(200).json({ message: 'Logged out successfully.' });
 });
 
-app.use(express.static(path.join(__dirname, '..', 'build')));
+//app.use(express.static(path.join(__dirname, '..', 'build')));
 
 // The "catch-all" handler: for any request that doesn't match an API route above,
 // send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+// });
 
 
 const PORT = process.env.PORT || 5000;

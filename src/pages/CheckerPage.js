@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import useIntersectionObserver from '../hooks/useIntersectionObserver'; 
-
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function CheckerPage() {
   const [password, setPassword] = useState('');
@@ -20,7 +20,7 @@ function CheckerPage() {
     setResult(null);
 
     try {
-      const response = await fetch('/api/check-password', {
+      const response = await fetch(`${API_URL}/api/check-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

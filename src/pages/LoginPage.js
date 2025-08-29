@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -8,12 +9,12 @@ const LoginPage = () => {
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
   const { login } = useAuth(); 
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch(`${API_URL}/api/user/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal'; 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
@@ -13,7 +14,7 @@ const ResetPasswordPage = () => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`/api/reset-password/${token}`, {
+      const response = await fetch(`${API_URL}/api/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),

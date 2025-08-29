@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal'; 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const SignUpPage = () => {
   const [step, setStep] = useState(1);
@@ -16,7 +17,7 @@ const SignUpPage = () => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch('/api/signup/initiate', {
+      const response = await fetch(`${API_URL}/api/signup/initiate`, { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
@@ -36,7 +37,7 @@ const SignUpPage = () => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch('/api/signup/verify', {
+      const response = await fetch(`${API_URL}/api/signup/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
