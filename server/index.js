@@ -225,6 +225,8 @@ app.post('/api/login', async (req, res) => {
     // Login successful! Creates the JWT.
     const payload = { user: { id: user.id } };
 
+    // In /server/index.js, inside the /api/login route
+
     jwt.sign(
       payload,
       process.env.JWT_SECRET,
@@ -234,16 +236,19 @@ app.post('/api/login', async (req, res) => {
         
         console.log(`Login successful for ${email}`);
         
+        // THIS IS THE CRITICAL FIX
         res.cookie('token', token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
+          secure: true, // true for cross-site cookies
+          sameSite: 'none', // Allows the cookie to be sent from a different domain
+          // The domain set to the backend's domain for it to work
+          domain: '.onrender.com', // Or your specific render domain if needed
         });
         
         res.status(200).json({
-        message: 'Login successful!',
-        user: { id: user.id, email: user.email, username: user.username },
+          message: 'Login successful!',
+          user: { id: user.id, email: user.email, username: user.username },
         });
-
       }
     );
   } catch (error) {
@@ -394,12 +399,15 @@ app.post('/api/user/change-password', protect, async (req, res) => {
 // ===================================
 //   LOGOUT ENDPOINT
 
+// In /server/index.js
+
 app.post('/api/logout', (req, res) => {
   res.clearCookie('token', { 
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
-    path: '/', 
+    secure: true,
+    sameSite: 'none',
+    domain: '.onrender.com', // Must match the login cookie settings
+    path: '/',
   });
   res.status(200).json({ message: 'Logged out successfully.' });
 });
@@ -407,7 +415,7 @@ app.post('/api/logout', (req, res) => {
 //app.use(express.static(path.join(__dirname, '..', 'build')));
 
 // The "catch-all" handler: for any request that doesn't match an API route above,
-// send back React's index.html file.
+// sends back React's index.html file.
 // app.get('*', (req, res) => {
 //   res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
 // });
