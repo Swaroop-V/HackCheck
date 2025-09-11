@@ -10,30 +10,30 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); 
   
+  // In /src/pages/LoginPage.js
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`${API_URL}/api/user/change-password`, {
+      // THIS IS THE CRITICAL FIX: The URL must be for the login endpoint.
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Important for sending/receiving cookies
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // If the login fails, throw an error to be caught by the catch block
         throw new Error(data.message || 'Login failed.');
       }
       
-      // If the response is OK, i will know the login was successful.
-      // updates the context and then navigate.
       login(data.user);
-      navigate('/dashboard'); // Navigate to the dashboard on success
+      navigate('/dashboard');
 
     } catch (error) {
-      // This block only runs if the fetch fails or if i threw an error above
       setMessage(error.toString());
     }
   };
