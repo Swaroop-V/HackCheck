@@ -11,9 +11,13 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
 const app = express();
+
+// THIS IS A CRITICAL ADDITION FOR RENDER
+app.set('trust proxy', 1);
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-  credentials: true                // Allows cookies to be sent and received
+  origin: process.env.FRONTEND_URL, 
+  credentials: true
 }));
 
 app.use(express.json());
@@ -225,7 +229,6 @@ app.post('/api/login', async (req, res) => {
     // Login successful! Creates the JWT.
     const payload = { user: { id: user.id } };
 
-    // In /server/index.js, inside the /api/login route
 
     jwt.sign(
       payload,
@@ -234,15 +237,12 @@ app.post('/api/login', async (req, res) => {
       (err, token) => {
         if (err) throw err;
         
-        console.log(`Login successful for ${email}`);
-        
-        // THIS IS THE CRITICAL FIX
+        // --- DEFINITIVE COOKIE SETTINGS FOR CROSS-DOMAIN ---
         res.cookie('token', token, {
           httpOnly: true,
-          secure: true, // true for cross-site cookies
-          sameSite: 'none', // Allows the cookie to be sent from a different domain
-          // The domain set to the backend's domain for it to work
-          domain: '.onrender.com', // Or your specific render domain if needed
+          secure: true,       // MUST be true for SameSite=None
+          sameSite: 'none',   // Allows cookie to be sent from different domains
+          path: '/',
         });
         
         res.status(200).json({
@@ -251,6 +251,7 @@ app.post('/api/login', async (req, res) => {
         });
       }
     );
+
   } catch (error) {
     console.error("Login server error:", error);
     res.status(500).json({ message: 'Server error during login.' });

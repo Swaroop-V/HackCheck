@@ -19,10 +19,10 @@ const ProfilePage = () => {
 
     try {
       // CRITICAL: URL MUST be relative for the proxy to work.
-      const response = await fetch('/api/user/change-password', {
+      const response = await fetch(`${API_URL}/api/user/change-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Important:  need to send the auth cookie
+        credentials: 'include', // Ensure this is present
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = await response.json();
