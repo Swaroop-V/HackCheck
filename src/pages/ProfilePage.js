@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import useIntersectionObserver from '../hooks/useIntersectionObserver'; // Import the hook
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const ProfilePage = () => {
   const { user } = useAuth();
