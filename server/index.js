@@ -235,13 +235,13 @@ app.post('/api/login', async (req, res) => {
       (err, token) => {
         if (err) throw err;
         
-        // --- DEFINITIVE COOKIE SETTINGS FOR CROSS-DOMAIN ---
+        // --- DEFINITIVE COOKIE SETTINGS - NO DOMAIN ---
         res.cookie('token', token, {
           httpOnly: true,
-          secure: true,       // MUST be true for SameSite=None
-          sameSite: 'none',   // Allows cookie to be sent from different domains
+          secure: true,
+          sameSite: 'none',
           path: '/',
-          domain: 'hackcheck-backend.onrender.com' // Set the specific domain
+          // The 'domain' attribute has been removed.
         });
         
         res.status(200).json({
@@ -408,19 +408,16 @@ app.post('/api/logout', (req, res) => {
     secure: true,
     sameSite: 'none',
     path: '/',
-    domain: 'hackcheck-backend.onrender.com' // Set the specific domain
+    // The 'domain' attribute has been removed here as well.
   });
   res.status(200).json({ message: 'Logged out successfully.' });
 });
 
+
 //app.use(express.static(path.join(__dirname, '..', 'build')));
 
 // The "catch-all" handler: for any request that doesn't match an API route above,
-// sends back React's index.html file.
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
-// });
-
+// sends back React's index.html file
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
