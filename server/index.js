@@ -180,9 +180,7 @@ app.post('/api/signup/verify', async (req, res) => {
   if (tempUser.otp !== otp) {
     return res.status(400).json({ message: 'Invalid OTP.' });
   }
-   try {
-    const tempUser = otpStore[email];
-    
+    try {
     // Hash the password explicitly here
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(tempUser.plainPassword, salt);
@@ -333,7 +331,7 @@ app.post('/api/reset-password/:token', async (req, res) => {
   const { password } = req.body;
   
   const hashedToken = crypto
-    .createHash('sha26')
+    .createHash('sha256')
     .update(req.params.token)
     .digest('hex');
 
@@ -386,6 +384,7 @@ app.post('/api/user/change-password', protect, async (req, res) => {
     }
 
     // Hash the new password explicitly
+    user.password = newPassword; // Set plain password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
     await user.save();
