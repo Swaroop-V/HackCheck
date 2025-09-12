@@ -17,19 +17,21 @@ export const AuthProvider = ({ children }) => {
 
   const isAuthenticated = !!user;
 
-  // Login function updates state and sessionStorage
-  const login = (userData) => {
-    if (userData && typeof userData === 'object') {
-      try {
+  // Make the login function async
+  const login = async (userData) => {
+    return new Promise((resolve) => {
+      if (userData && typeof userData === 'object') {
         sessionStorage.setItem('user', JSON.stringify(userData));
         setUser(userData);
-      } catch (error) {
-        console.error("Failed to save user to sessionStorage", error);
+        // Resolve the promise after the state has been set.
+        // We add a tiny delay to give the browser time to process the cookie.
+        setTimeout(resolve, 50); 
+      } else {
+        resolve();
       }
-    }
+    });
   };
 
-  // Logout function clears state and sessionStorage
   const logout = () => {
     sessionStorage.removeItem('user');
     setUser(null);

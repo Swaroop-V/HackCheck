@@ -12,25 +12,27 @@ const LoginPage = () => {
   
   // In /src/pages/LoginPage.js
 
+  // In /src/pages/LoginPage.js
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      // THIS IS THE CRITICAL FIX: The URL must be for the login endpoint.
       const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Important for sending/receiving cookies
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         throw new Error(data.message || 'Login failed.');
       }
       
-      login(data.user);
+      // THIS IS THE CRITICAL FIX: We now AWAIT the login function.
+      await login(data.user);
+      
+      // The navigation will only happen AFTER the login state is fully set.
       navigate('/dashboard');
 
     } catch (error) {
