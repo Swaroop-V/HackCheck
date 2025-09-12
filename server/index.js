@@ -241,6 +241,7 @@ app.post('/api/login', async (req, res) => {
           secure: true,       // MUST be true for SameSite=None
           sameSite: 'none',   // Allows cookie to be sent from different domains
           path: '/',
+          domain: 'hackcheck-backend.onrender.com' // Set the specific domain
         });
         
         res.status(200).json({
@@ -402,12 +403,12 @@ app.post('/api/user/change-password', protect, async (req, res) => {
 // In /server/index.js
 
 app.post('/api/logout', (req, res) => {
-  res.clearCookie('token', {
+  res.clearCookie('token', { 
     httpOnly: true,
     secure: true,
     sameSite: 'none',
-    domain: '.onrender.com', // Must match the login cookie settings
     path: '/',
+    domain: 'hackcheck-backend.onrender.com' // Set the specific domain
   });
   res.status(200).json({ message: 'Logged out successfully.' });
 });
