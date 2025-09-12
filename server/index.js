@@ -402,7 +402,7 @@ app.post('/api/user/change-password', protect, async (req, res) => {
 // In /server/index.js
 
 app.post('/api/logout', (req, res) => {
-  res.clearCookie('token', { 
+  res.clearCookie('token', {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
