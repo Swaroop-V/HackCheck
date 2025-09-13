@@ -408,7 +408,6 @@ app.post('/api/logout', (req, res) => {
     secure: true,
     sameSite: 'none',
     path: '/',
-    // The 'domain' attribute has been removed here as well.
   });
   res.status(200).json({ message: 'Logged out successfully.' });
 });
@@ -419,5 +418,4 @@ app.post('/api/logout', (req, res) => {
 // The "catch-all" handler: for any request that doesn't match an API route above,
 // sends back React's index.html file
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports = app;
