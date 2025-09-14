@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'; 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -10,35 +9,32 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { login } = useAuth(); 
   
-  // In /src/pages/LoginPage.js
-
-  // In /src/pages/LoginPage.js
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`${API_URL}/api/login`, {
+      const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
+        // 'credentials' is no longer needed for same-origin requests, but it's safe to keep.
+        credentials: 'include', 
         body: JSON.stringify({ email, password }),
       });
+
       const data = await response.json();
+
       if (!response.ok) {
         throw new Error(data.message || 'Login failed.');
       }
       
-      // THIS IS THE CRITICAL FIX: We now AWAIT the login function.
-      await login(data.user);
-      
-      // The navigation will only happen AFTER the login state is fully set.
+      login(data.user);
       navigate('/dashboard');
 
     } catch (error) {
       setMessage(error.toString());
     }
   };
+
 
   return (
     <div className="checker">

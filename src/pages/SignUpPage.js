@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal'; 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const SignUpPage = () => {
   const [step, setStep] = useState(1);
@@ -13,11 +12,11 @@ const SignUpPage = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false); 
   const navigate = useNavigate();
 
-  const handleInitiateSubmit = async (e) => {
+    const handleInitiateSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`${API_URL}/api/signup/initiate`, { 
+      const response = await fetch('/api/signup/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
@@ -37,7 +36,7 @@ const SignUpPage = () => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`${API_URL}/api/signup/verify`, {
+      const response = await fetch('/api/signup/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, otp }),
@@ -46,9 +45,7 @@ const SignUpPage = () => {
       if (!response.ok) {
         throw new Error(data.message || 'An error occurred.');
       }
-      
       setShowSuccessModal(true);
-
     } catch (error) {
       setMessage(error.toString());
     }

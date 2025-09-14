@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom'; 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const DashboardPage = () => {
   const { user } = useAuth();
@@ -10,10 +9,8 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {        
-        const response = await fetch(`${API_URL}/api/dashboard`, {
-          credentials: 'include', 
-        });
+      try {
+        const response = await fetch('/api/dashboard');
         if (!response.ok) {
           throw new Error('Failed to fetch dashboard data. Please log in again.');
         }

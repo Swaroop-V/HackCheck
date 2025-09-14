@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal'; 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
@@ -10,11 +9,11 @@ const ResetPasswordPage = () => {
   const { token } = useParams();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`${API_URL}/api/reset-password/${token}`, {
+      const response = await fetch(`/api/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -22,13 +21,12 @@ const ResetPasswordPage = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       
-      // 3. Instead of an alert, show the modal
-      setShowSuccessModal(true);
-
+      alert(data.message);
+      navigate('/login');
     } catch (error) {
       setMessage(error.toString());
     }
-  };
+  };  
 
   // 4. This function will be called when the modal's button is clicked
   const handleModalClose = () => {

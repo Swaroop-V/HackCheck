@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import useIntersectionObserver from '../hooks/useIntersectionObserver'; // Import the hook
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 const ProfilePage = () => {
   const { user } = useAuth();
@@ -13,17 +12,16 @@ const ProfilePage = () => {
   // Hook for the animation
   const [containerRef, containerIsVisible] = useIntersectionObserver({ threshold: 0.1 });
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
     setError('');
 
     try {
-      // CRITICAL: URL MUST be relative for the proxy to work.
-      const response = await fetch(`${API_URL}/api/user/change-password`, {
+      const response = await fetch('/api/user/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // Ensure this is present
+        credentials: 'include',
         body: JSON.stringify({ currentPassword, newPassword }),
       });
       const data = await response.json();

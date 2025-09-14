@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import useIntersectionObserver from '../hooks/useIntersectionObserver'; 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function CheckerPage() {
   const [password, setPassword] = useState('');
@@ -11,8 +10,7 @@ function CheckerPage() {
 
   const [cardRef, cardIsVisible] = useIntersectionObserver({ threshold: 0.1 });
 
-
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
     e.preventDefault();
     if (!password.trim()) return;
 
@@ -20,30 +18,21 @@ function CheckerPage() {
     setResult(null);
 
     try {
-      const response = await fetch(`${API_URL}/api/check-password`, {
+      const response = await fetch('/api/check-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
       });
 
       if (!response.ok) {
-        // Handle server-side errors (like 400 or 500)
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'An unknown server error occurred.');
+        throw new Error(errorData.message || 'Failed to check password');
       }
 
       const data = await response.json();
       setResult(data);
     } catch (error) {
-      // This catch block handles network errors (like 'Failed to fetch')
-      // AND errors thrown from a bad server response.
-      // created both a message and a subMessage for errors.
-      setResult({ 
-        error: true, 
-        message: 'An error occurred while checking.',
-        subMessage: 'Please try again later.'
-      });
-      console.error("Fetch Error:", error); // Log the actual error for debugging
+      setResult({ error: true, message: error.toString() });
     } finally {
       setLoading(false);
     }

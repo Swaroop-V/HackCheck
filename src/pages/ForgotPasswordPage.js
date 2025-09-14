@@ -10,7 +10,7 @@ const ForgotPasswordPage = () => {
     e.preventDefault();
     setMessage('');
     try {
-      const response = await fetch(`${API_URL}/api/forgot-password`, { 
+      const response = await fetch('/api/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
