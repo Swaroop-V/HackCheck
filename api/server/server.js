@@ -12,7 +12,7 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
-// THIS IS A CRITICAL ADDITION FOR RENDER
+// CRITICAL ADDITION FOR RENDER
 app.set('trust proxy', 1);
 
 app.use(cors({
@@ -181,14 +181,14 @@ app.post('/api/signup/verify', async (req, res) => {
     return res.status(400).json({ message: 'Invalid OTP.' });
   }
     try {
-    // Hash the password explicitly here
+    // Hashing the password explicitly here
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(tempUser.plainPassword, salt);
 
     const newUser = new User({
       username: tempUser.username,
       email: email,
-      password: passwordHash, // Save the hashed password
+      password: passwordHash,
     });
     await newUser.save();
     
@@ -241,7 +241,6 @@ app.post('/api/login', async (req, res) => {
           secure: true,
           sameSite: 'none',
           path: '/',
-          // The 'domain' attribute has been removed.
         });
         
         res.status(200).json({
@@ -297,12 +296,12 @@ app.post('/api/forgot-password', async (req, res) => {
       .update(resetToken)
       .digest('hex');
 
-    // 3. Sets an expiry time (e.g., 10 minutes)
+    // 3. Sets an expiry time (like 10 minutes)
     user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     await user.save();
 
-    // 4. Creates the reset URL and send the email (containing the un-hashed token)
+    // 4. Creates the reset URL and sends the email (containing the un-hashed token)
     const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
 
     const mailOptions = {
@@ -364,7 +363,7 @@ app.post('/api/reset-password/:token', async (req, res) => {
 
 
 // ===================================
-//   USER PROFILE - CHANGE PASSWORD (CORRECTED)
+//   USER PROFILE - CHANGE PASSWORD
 // ===================================
 app.post('/api/user/change-password', protect, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
@@ -384,7 +383,7 @@ app.post('/api/user/change-password', protect, async (req, res) => {
       return res.status(401).json({ message: 'Incorrect current password.' });
     }
 
-    // Hash the new password explicitly
+    // Hashes the new password explicitly
     user.password = newPassword; // Set plain password
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
@@ -399,9 +398,6 @@ app.post('/api/user/change-password', protect, async (req, res) => {
 
 // ===================================
 //   LOGOUT ENDPOINT
-
-// In /server/index.js
-
 app.post('/api/logout', (req, res) => {
   res.clearCookie('token', { 
     httpOnly: true,
@@ -413,9 +409,8 @@ app.post('/api/logout', (req, res) => {
 });
 
 
-//app.use(express.static(path.join(__dirname, '..', 'build')));
 
-// The "catch-all" handler: for any request that doesn't match an API route above,
+//  "catch-all" handler: for any request that doesn't match an API route above,
 // sends back React's index.html file
 
 module.exports = app;

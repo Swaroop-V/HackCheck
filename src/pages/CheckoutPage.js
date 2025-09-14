@@ -55,7 +55,7 @@ const CheckoutPage = () => {
     if (!/^(0[1-9]|1[0-2])\s\/\s\d{2}$/.test(formData.expiry)) {
       newErrors.expiry = 'Format must be MM / YY.';
     } else {
-      const [month, year] = formData.expiry.split(' / ');
+      const [, year] = formData.expiry.split(' / '); // The comma ignores the first value
       const fullYear = parseInt('20' + year);
       
       if (fullYear < 2025 || fullYear > 2030) {

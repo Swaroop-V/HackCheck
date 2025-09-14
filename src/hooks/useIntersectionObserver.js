@@ -1,3 +1,5 @@
+// In /src/hooks/useIntersectionObserver.js
+
 import { useEffect, useRef, useState } from 'react';
 
 const useIntersectionObserver = (options) => {
@@ -5,6 +7,9 @@ const useIntersectionObserver = (options) => {
   const elementRef = useRef(null);
 
   useEffect(() => {
+    // THIS IS THE FIX: We copy the ref's current value to a variable inside the effect.
+    const element = elementRef.current;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -15,16 +20,17 @@ const useIntersectionObserver = (options) => {
       options
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
+    if (element) {
+      observer.observe(element);
     }
 
+    // The cleanup function now uses the stable 'element' variable.
     return () => {
-      if (elementRef.current) {
-        observer.unobserve(elementRef.current);
+      if (element) {
+        observer.unobserve(element);
       }
     };
-  }, [options]);
+  }, [options]); // The dependency array is now correct.
 
   return [elementRef, isIntersecting];
 };
