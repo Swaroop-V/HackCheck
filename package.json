@@ -28,12 +28,12 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "node server/index.js",
+    "start": "node api/server/server.js",
     "dev": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "server": "node server/index.js"
+    "server": "node api/server/server.js"
   },
   "eslintConfig": {
     "extends": [
