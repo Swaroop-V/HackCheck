@@ -1,48 +1,40 @@
 require('dotenv').config();
 
+// 1. Use CommonJS 'require' syntax for all imports
 const express = require('express');
 const cors = require('cors');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
-const path = require('path'); // Required for serving static files
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const fetch = require('node-fetch');
 
 const app = express();
 
-// CRITICAL ADDITION FOR RENDER
 app.set('trust proxy', 1);
-
 app.use(cors({
-  origin: process.env.FRONTEND_URL, 
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true
 }));
-
 app.use(express.json());
 app.use(cookieParser());
 
-console.log('Attempting to connect with MONGO_URI:', process.env.MONGO_URI);
 
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB Atlas Connected...'))
-  .catch(err => console.log(err));
-
-
+// Mongoose Schema
 const UserSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true }, 
+  username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   isVerified: { type: Boolean, default: true },
   passwordResetToken: String,
   passwordResetExpires: Date,
 });
-
-const User = mongoose.model('User', UserSchema);
-
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
 const otpStore = {};
 
+// Nodemailer Transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -51,20 +43,15 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ===================================
-//   AUTHENTICATION MIDDLEWARE
-// ===================================
+// Auth Middleware
 const protect = async (req, res, next) => {
+  await dbConnect(); // Ensure DB is connected
   const token = req.cookies.token;
-
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, no token' });
   }
-
   try {
-    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    // Attach the user to the request object
     req.user = await User.findById(decoded.user.id).select('-password');
     next();
   } catch (error) {
