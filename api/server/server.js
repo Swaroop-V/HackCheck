@@ -11,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const fetch = require('node-fetch');
 
+
 const app = express();
 
 app.set('trust proxy', 1);
@@ -190,7 +191,6 @@ app.post('/api/signup/verify', async (req, res) => {
 
 //   UPDATED LOGIN ENDPOINT
 // ===================================
-
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -211,9 +211,7 @@ app.post('/api/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
-    // Login successful! Creates the JWT.
     const payload = { user: { id: user.id } };
-
 
     jwt.sign(
       payload,
@@ -222,7 +220,6 @@ app.post('/api/login', async (req, res) => {
       (err, token) => {
         if (err) throw err;
         
-        // --- DEFINITIVE COOKIE SETTINGS - NO DOMAIN ---
         res.cookie('token', token, {
           httpOnly: true,
           secure: true,
