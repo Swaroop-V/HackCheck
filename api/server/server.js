@@ -14,6 +14,21 @@ const fetch = require('node-fetch');
 
 const app = express();
 
+// v--- ADD THIS NEW CODE BLOCK HERE ---v
+if (!process.env.MONGODB_URI) {
+  throw new Error('Please define the MONGODB_URI environment variable');
+}
+
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log("MongoDB Connected...");
+}).catch(err => {
+  console.error("MongoDB connection error:", err);
+});
+// ^--- END OF NEW CODE BLOCK ---^
+
 app.set('trust proxy', 1);
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
