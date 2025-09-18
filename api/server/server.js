@@ -203,6 +203,15 @@ app.post('/signup/verify', async (req, res) => {
 });
 
 
+// ===================================
+//  TEMPORARY TEST ROUTE
+// ===================================
+app.get('/test', (req, res) => {
+  res.status(200).json({ message: 'The API is alive!' });
+});
+
+// ===================================
+
 
 //   UPDATED LOGIN ENDPOINT
 // ===================================
