@@ -4,13 +4,15 @@
   publish = "build"
   functions = "api"
 
-# CORRECTED rewrite rule for the API
+# Rewrite rule for the API.
+# This sends any request starting with /api/ to your 'server' function.
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/server"
   status = 200
 
-# Fallback rewrite rule for the React App (SPA)
+# Fallback rewrite rule for the React App.
+# This must be last.
 [[redirects]]
   from = "/*"
   to = "/index.html"
