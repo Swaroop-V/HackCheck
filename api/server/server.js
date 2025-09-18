@@ -200,7 +200,7 @@ app.post('/signup/verify', async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error creating user account.' });
   }
-});
+}); 
 
 
 // ===================================
