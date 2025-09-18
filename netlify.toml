@@ -4,10 +4,10 @@
   publish = "build"
   functions = "api"
 
-# Rewrite rule for the API
+# CORRECTED rewrite rule for the API
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/server"
   status = 200
 
 # Fallback rewrite rule for the React App (SPA)
