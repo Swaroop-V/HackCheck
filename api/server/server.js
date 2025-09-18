@@ -419,7 +419,6 @@ app.post('/logout', (req, res) => {
 });
 
 
-
 //  "catch-all" handler: for any request that doesn't match an API route above,
 // sends back React's index.html file
 
