@@ -1,0 +1,17 @@
+# Netlify Build Settings
+[build]
+  command = "npm run build"
+  publish = "build"
+  functions = "api"
+
+# Rewrite rule for the API
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Fallback rewrite rule for the React App (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

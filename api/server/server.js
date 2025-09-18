@@ -1,3 +1,5 @@
+const serverless = require('serverless-http');
+
 require('dotenv').config();
 
 // 1. Use CommonJS 'require' syntax for all imports
