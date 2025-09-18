@@ -63,7 +63,6 @@ const transporter = nodemailer.createTransport({
 
 // Auth Middleware
 const protect = async (req, res, next) => {
-  await dbConnect(); // Ensure DB is connected
   const token = req.cookies.token;
   if (!token) {
     return res.status(401).json({ message: 'Not authorized, no token' });
@@ -77,7 +76,7 @@ const protect = async (req, res, next) => {
   }
 };
 
-app.post('/check-password', async (req, res) => {
+app.post('/api/check-password', async (req, res) => {
   const { password } = req.body;
   if (!password) {
     return res.status(400).json({ leaked: false, message: 'Password is required' });
@@ -131,7 +130,7 @@ app.post('/check-password', async (req, res) => {
   }
 });
 
-app.post('/signup/initiate', async (req, res) => {
+app.post('/api/signup/initiate', async (req, res) => {
   const { username, email, password } = req.body; 
   if (!username || !email || !password) { 
     return res.status(400).json({ message: 'Username, email, and password are required.' });
@@ -169,7 +168,7 @@ app.post('/signup/initiate', async (req, res) => {
   }
 });
 
-app.post('/signup/verify', async (req, res) => {
+app.post('/api/signup/verify', async (req, res) => {
   const { email, otp } = req.body;
   if (!email || !otp) {
     return res.status(400).json({ message: 'Email and OTP are required.' });
@@ -205,19 +204,11 @@ app.post('/signup/verify', async (req, res) => {
 }); 
 
 
-// ===================================
-//  TEMPORARY TEST ROUTE
-// ===================================
-app.get('/test', (req, res) => {
-  res.status(200).json({ message: 'The API is alive!' });
-});
-
-// ===================================
 
 
 //   UPDATED LOGIN ENDPOINT
 // ===================================
-app.post('/login', async (req, res) => {
+app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -269,7 +260,7 @@ app.post('/login', async (req, res) => {
 // ===================================
 //   DASHBOARD ENDPOINT (PROTECTED)
 // ===================================
-app.get('/dashboard', protect, async (req, res) => {
+app.get('/api/dashboard', protect, async (req, res) => {
   
   res.json({
     message: `Welcome, ${req.user.username}!`,
@@ -284,7 +275,7 @@ app.get('/dashboard', protect, async (req, res) => {
 // ===================================
 //   PASSWORD RESET - PHASE 1: REQUEST
 // ===================================
-app.post('/forgot-password', async (req, res) => {
+app.post('/api/forgot-password', async (req, res) => {
   const { email } = req.body;
   if (!email) {
     return res.status(400).json({ message: 'Please provide an email address.' });
@@ -337,7 +328,7 @@ app.post('/forgot-password', async (req, res) => {
 // ===================================
 //   PASSWORD RESET - PHASE 2: RESET (CORRECTED)
 // ===================================
-app.post('/reset-password/:token', async (req, res) => {
+app.post('/api/reset-password/:token', async (req, res) => {
   const { password } = req.body;
   
   const hashedToken = crypto
@@ -375,7 +366,7 @@ app.post('/reset-password/:token', async (req, res) => {
 // ===================================
 //   USER PROFILE - CHANGE PASSWORD
 // ===================================
-app.post('/user/change-password', protect, async (req, res) => {
+app.post('/api/user/change-password', protect, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   
   if (!currentPassword || !newPassword) {
@@ -408,7 +399,7 @@ app.post('/user/change-password', protect, async (req, res) => {
 
 // ===================================
 //   LOGOUT ENDPOINT
-app.post('/logout', (req, res) => {
+app.post('/api/logout', (req, res) => {
   res.clearCookie('token', { 
     httpOnly: true,
     secure: true,
