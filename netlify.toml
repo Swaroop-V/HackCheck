@@ -3,14 +3,11 @@
   publish = "build"
   functions = "netlify/functions"
 
-# This rule proxies all API requests to your serverless function
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
+  to = "/.netlify/functions/api.js/:splat" # <-- THIS IS THE TYPO FIX
   status = 200
 
-# THIS IS THE CRITICAL FIX FOR YOUR REACT APP
-# It tells Netlify to serve index.html for any path that is not a file
 [[redirects]]
   from = "/*"
   to = "/index.html"
