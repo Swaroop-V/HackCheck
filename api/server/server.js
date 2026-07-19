@@ -303,7 +303,7 @@ app.post('/api/forgot-password', async (req, res) => {
     await user.save();
 
     // 4. Creates the reset URL and sends the email (containing the un-hashed token)
-    const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+    const resetURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
     const mailOptions = {
       from: `"HackCheck Support" <${process.env.GMAIL_USER}>`,
