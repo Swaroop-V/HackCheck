@@ -1,13 +1,18 @@
+# Netlify Build Settings
 [build]
   command = "npm run build"
   publish = "build"
-  functions = "netlify/functions"
+  functions = "api"
 
+# Rewrite rule for the API.
+# This sends any request starting with /api/ to your 'server' function.
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api.js/:splat" # <-- THIS IS THE TYPO FIX
+  to = "/.netlify/functions/server"
   status = 200
 
+# Fallback rewrite rule for the React App.
+# This must be last.
 [[redirects]]
   from = "/*"
   to = "/index.html"
