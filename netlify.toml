@@ -1,18 +1,16 @@
-# Netlify Build Settings
 [build]
   command = "npm run build"
   publish = "build"
-  functions = "api"
+  functions = "netlify/functions"
 
-# Rewrite rule for the API.
-# This sends any request starting with /api/ to your 'server' function.
+# This rule proxies all API requests to your serverless function
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/server"
+  to = "/.netlify/functions/api/:splat"
   status = 200
 
-# Fallback rewrite rule for the React App.
-# This must be last.
+# THIS IS THE CRITICAL FIX FOR YOUR REACT APP
+# It tells Netlify to serve index.html for any path that is not a file
 [[redirects]]
   from = "/*"
   to = "/index.html"
